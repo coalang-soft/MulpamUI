@@ -1,0 +1,80 @@
+#include ccl/jui JUI.cl2 Launcher.cl2
+#include <io/URL>
+#include <io/File>
+#include ccl/jio/Stream.cl2
+#include <Console>
+
+def createMulpamView(Prop, mulpamDir,mulpamPath,projects){	
+
+	def tableColumn(name, factory){
+		var tc = JUI.control("TableColumn")(name);
+		tc.setCellValueFactory(factory.bind());
+		return tc;
+	}
+	
+	def item(project){
+		var s = array(project.split(" "));
+		var ret = [];
+		ret.push(File(mulpamDir.getPath() & "/" & s.get(1)));
+		ret.push(s.get(0));
+		ret.push(s.get(1));
+		return ret;
+	}
+	
+	def cellFactory(index, data){
+		return Prop(data.getValue().get(index));
+	}
+	
+	def installButtonFactory(data){
+		
+		def install(arr){
+			println("Install...");
+			var pb = java("java.lang.ProcessBuilder")([
+				"perl", mulpamPath, "github", arr.get(1), arr.get(2)
+			]);
+			pb.directory(java("java.io.File")(mulpamDir.getPath()));
+			var p = pb.start();	
+			stdout.downloadFrom(Stream(p.getInputStream()));
+			
+			table.getItems().clear();
+			table.getItems().add.for(items);
+		}
+		
+		var btn = JUI.control("Button")(
+			"Install " & data.getValue().get(2)
+		);
+		//btn.setOnAction(install.bind(data.getValue()));
+		btn.setOnAction(
+			install.bind(data.getValue())
+		);
+		btn.setDisable(data.getValue().get(0).exists());
+		return Prop(btn);
+	}
+	
+	mulpamDir = File(mulpamDir());
+	mulpamPath = mulpamPath();
+	
+	projects = URL(projects());
+	projects = projects.buildString();
+	projects = array(projects.split("\n"));
+	
+	var table = JUI.control("TableView")();
+	var org = tableColumn(
+		"Organisation",
+		cellFactory.bind(1)
+	);
+	var prj = tableColumn(
+		"Project",
+		cellFactory.bind(2)
+	);
+	var install = tableColumn(
+		"Install", installButtonFactory.bind()
+	);
+	table.getColumns().add.for([org, prj, install]);
+	
+	var items = item.for(projects);
+	table.getItems().add.for(
+		items
+	);
+	return table;
+}

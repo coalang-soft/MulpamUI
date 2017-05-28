@@ -1,0 +1,13 @@
+#include "mulpamUiBase.ccl"
+
+def start(stage){
+	stage.setScene(JUI.Scene(createMulpamView(
+		 java("javafx.beans.property.SimpleObjectProperty"),
+		"D:/Mulpam", 
+		"F:/Info/antlangsoft/mulpam/MuLPaM/mulpam.pl",
+		"https://rawgit.com/coalang-soft/MuLPaM-config/master/projects.txt"
+	)));
+	stage.show();
+}
+
+Launcher().launch(start, []);
