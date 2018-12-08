@@ -5,7 +5,7 @@ def start(stage){
 		 java("javafx.beans.property.SimpleObjectProperty"),
 		"D:/Mulpam", 
 		"F:/Info/antlangsoft/mulpam/MuLPaM/mulpam.pl",
-		"https://rawgit.com/coalang-soft/MuLPaM-config/master/projects.txt"
+		"https://cdn.jsdelivr.net/gh/coalang-soft/MuLPaM-config/projects.txt"
 	)));
 	stage.show();
 }
